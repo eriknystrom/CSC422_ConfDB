@@ -38,6 +38,7 @@ public class CollegeDBTesterGUI extends Application
     private Label      q8Label;
     
     //We need 5 text fields
+    private TextField time_slot;
     private TextField status2TF;
     private TextField deptId3TF;
     private TextField deptId4TF;
@@ -86,6 +87,7 @@ public class CollegeDBTesterGUI extends Application
         
         //----------------------------------------------------------
         // Create the text fields
+        time_slot = new TextField("<TimeSlot 1-5>");
         status2TF = new TextField("<status>");
         deptId3TF = new TextField("<deptId>");
         deptId4TF = new TextField("<deptId>");
@@ -116,7 +118,7 @@ public class CollegeDBTesterGUI extends Application
         //----------------------------------------------------------
         //Add the components to the pane
         pane.add(displayLabel, 0, 0); 
-        pane.add(q1Label,      0, 1);  pane.add(q1,  3,  1);
+        pane.add(q1Label,      0, 1);  pane.add(time_slot, 1, 1);     pane.add(q1,  3,  1);
         pane.add(q2Label,      0, 2);  pane.add(status2TF, 1, 2);     pane.add(q2,  3,  2);
         pane.add(q3Label,      0, 3);  pane.add(deptId3TF, 1, 3);     pane.add(q3,  3,  3);
         pane.add(q4Label,      0, 4);  pane.add(deptId4TF, 1, 4);     pane.add(q4,  3,  4);
@@ -142,9 +144,11 @@ public class CollegeDBTesterGUI extends Application
         {
             public void handle(ActionEvent e)
             {
-               	String query = "SELECT * FROM  PROFESSOR_15 "; 
+                String time_slot_query = "SELECT StartTime FROM TIME_SLOT WHERE TimeSlotId='"+time_slot.getText()+"';";
+                String timeString = retrieveFromTable(time_slot_query, Boolean.FALSE);
+               	String query = "SELECT COUNT(PaperId) FROM PAPER WHERE StartTime='" + timeString + "';";
                	System.out.println(query);
-               	String displayString = retrieveFromTable(query);
+               	String displayString = "Number of papers at " + timeString + ":   " + retrieveFromTable(query, Boolean.FALSE);
                	results.setText(displayString);
             }
         }
@@ -159,7 +163,7 @@ public class CollegeDBTesterGUI extends Application
             	String status = status2TF.getText();
             	String query = "SELECT BannerId, StudentName FROM STUDENT_15 WHERE Status = '"+
                     status + "';"; 
-            	String displayString = retrieveFromTable(query);
+            	String displayString = retrieveFromTable(query, Boolean.FALSE);
             	results.setText(displayString);
             }
         }
@@ -175,7 +179,7 @@ public class CollegeDBTesterGUI extends Application
             			"D.DepartmentName FROM PROFESSOR_15 P, DEPARTMENT_15 D "+ 
             			"WHERE P.DepartmentId = D.DepartmentId AND P.DepartmentId = '" + 
             			deptId +"';"; 
-            	String displayString = retrieveFromTable(query);
+            	String displayString = retrieveFromTable(query, Boolean.FALSE);
             	results.setText(displayString);
             }
         }
@@ -195,7 +199,7 @@ public class CollegeDBTesterGUI extends Application
             			+ "C.CourseCode = T.CourseCode "+
             			"AND C.DepartmentId = '" + deptId + "';";
             	System.out.println(query);
-            	String displayString = retrieveFromTable(query);
+            	String displayString = retrieveFromTable(query, Boolean.FALSE);
             	results.setText(displayString);
             }
         }
@@ -212,7 +216,7 @@ public class CollegeDBTesterGUI extends Application
             			"WHERE S.BannerId = T.StudentId AND C.CourseCode = T.CourseCode "+
             			"AND T.StudentId = '"+ stuId + "';"; 
             	System.out.println(query);
-            	String displayString = retrieveFromTable(query);
+            	String displayString = retrieveFromTable(query, Boolean.FALSE);
             	results.setText(displayString);
             }
         }
@@ -336,11 +340,44 @@ public class CollegeDBTesterGUI extends Application
 		}
 		return result;
 	}
-    
+
+    private static String vecToStringNoHeaders(Vector<Properties> data)
+    {
+        String result = "";
+        // Now, we have to print out these rows in a user-understandable form
+        if ((data == null) || (data.size() == 0))
+        {
+            return ("No results were returned from database for this query");
+        }
+        else
+        {
+            // Print the headers
+            // result = ("==============================================\n");
+            Properties p1 = data.firstElement();
+            Enumeration props1 = p1.propertyNames();
+            while (props1.hasMoreElements())
+                //result += (props1.nextElement()+"\t");
+                    props1.nextElement();
+            //result += "\n";
+            //result += ("----------------------------------------------\n");
+
+            // Now go thru the entire 'data' Vector, get each Properties object out of it
+            // and print out the contents of the Properties object
+            for (Properties p : data)
+            {
+                Enumeration props = p.propertyNames();
+                while (props.hasMoreElements())
+                    result += (p.getProperty((String)(props.nextElement())));
+                //result += "\n";
+            }
+            //result += ("==============================================");
+        }
+        return result;
+    }
     
   	//----------------------------------------------------------------------------
     //-------------------------------------------------------------------------------
-    public static String retrieveFromTable(String queryString)
+    public static String retrieveFromTable(String queryString, Boolean headers)
     {
     	// First, set up an instance of the DatabaseAccessor class
     	DatabaseAccessor dbAcc = new DatabaseAccessor();
@@ -354,8 +391,11 @@ public class CollegeDBTesterGUI extends Application
     	// Properties objects. Each Properties object in this Vector contains the data from
     	// one of the db table rows matching the query
     	Vector<Properties> returnedValues = dbAcc.executeSQLSelectStatement();
-    	
-    	return vecToString(returnedValues);
+        if (headers == Boolean.TRUE) {
+            return vecToString(returnedValues);
+        } else {
+            return vecToStringNoHeaders(returnedValues);
+        }
     	// Print the results
     	//printValues(returnedValues);
     }

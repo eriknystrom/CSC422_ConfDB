@@ -8,7 +8,7 @@ import java.util.Vector;
 
 import java.io.IOException;
 
-
+//test
 // Tester for the Java-DB Connection using College DB
 //====================================================================================
 public class CollegeDBTester {
@@ -120,7 +120,7 @@ public class CollegeDBTester {
 	
 	public static void handleQuery1()
 	{
-	    String query = "SELECT * FROM  PROFESSOR_15 "; 
+	    String query = "SELECT * FROM  AUTHOR ";
 	    System.out.println(query);
 	    DatabaseAccessor dbAcc = new DatabaseAccessor();
 	    dbAcc.setSQLStatement(query);
