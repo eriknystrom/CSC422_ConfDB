@@ -19,7 +19,7 @@ import java.util.*;
  * @version (2017)
  */
  //----------------------------------------------------------
-public class CollegeDBTesterGUI extends Application
+public class ConfDBTesterGUI extends Application
 {   
     // Declare all the GUI components as instance variables. 
     // Don't create the objects at this point.
@@ -27,15 +27,15 @@ public class CollegeDBTesterGUI extends Application
     private GridPane   pane;
     
     // We need 5 labels
-    private Label      displayLabel;
-    private Label      q1Label;
-    private Label      q2Label;
-    private Label      q3Label;
-    private Label      q4Label;
-    private Label      q5Label;
-    private Label      q6Label;
-    private Label      q7Label;
-    private Label      q8Label;
+//    private Label      displayLabel;
+//    private Label      q1Label;
+//    private Label      q2Label;
+//    private Label      q3Label;
+//    private Label      q4Label;
+//    private Label      q5Label;
+//    private Label      q6Label;
+//    private Label      q7Label;
+//    private Label      q8Label;
     
     //We need 5 text fields
     private TextField time_slot;
@@ -64,7 +64,7 @@ public class CollegeDBTesterGUI extends Application
     private TextArea results;
     
     // We need a scene
-    private Scene scene;
+//    private Scene scene;
     
     //----------------------------------------------------------
     // crtate GUI components
@@ -75,15 +75,15 @@ public class CollegeDBTesterGUI extends Application
         
         //----------------------------------------------------------
         //Create Labels
-        displayLabel = new Label("DISPLAY INFORMATION");
-        q1Label = new Label("Q1. All the information from Professor table");
-        q2Label = new Label("Q2. BannerId and Names of all students with this ");
-        q3Label = new Label("Q3. Professor id, name, and Department for this ");
-        q4Label = new Label("Q4. Prof Name, Crs Name, Sem and Section for all courses in this ");
-        q5Label = new Label("Q5. Stu name, Crs Name, Sem, Section & grade for the student with this  ");
-        q6Label = new Label("Q6. Insert a new department ");
-        q7Label = new Label("Q7. Update a Student Status ");
-        q8Label = new Label("Q8. Delete a department ");
+        Label displayLabel = new Label("DISPLAY INFORMATION");
+        Label q1Label = new Label("Q1. Papers in selected time-slot");
+        Label q2Label = new Label("Q2. Papers scheduled in selected building");
+        Label q3Label = new Label("Q3. Professor id, name, and Department for this ");
+        Label q4Label = new Label("Q4. Prof Name, Crs Name, Sem and Section for all courses in this ");
+        Label q5Label = new Label("Q5. Stu name, Crs Name, Sem, Section & grade for the student with this  ");
+        Label q6Label = new Label("Q6. Insert a new department ");
+        Label q7Label = new Label("Q7. Update a Student Status ");
+        Label q8Label = new Label("Q8. Delete a department ");
         
         //----------------------------------------------------------
         // Create the text fields
@@ -136,7 +136,7 @@ public class CollegeDBTesterGUI extends Application
     }
     //----------------------------------------------------------
     //Attach handlers
-    public void attachHandlers()
+    private void attachHandlers()
     {
 	//----------------------------------------------------------
         
@@ -144,11 +144,17 @@ public class CollegeDBTesterGUI extends Application
         {
             public void handle(ActionEvent e)
             {
-                String time_slot_query = "SELECT StartTime FROM TIME_SLOT WHERE TimeSlotId='"+time_slot.getText()+"';";
+                String time_slot_query = "SELECT starttime,endtime FROM TIME_SLOT WHERE TimeSlotId='"+time_slot.getText()+"';";
+
+                Vector<Properties> returnString = retrieveFromQuery(time_slot_query);
+                String starttime = retrieveKeyedItem("starttime", returnString);
+                String endtime = retrieveKeyedItem("endtime", returnString);
+
+
                 String timeString = retrieveFromTable(time_slot_query, Boolean.FALSE);
-               	String query = "SELECT COUNT(PaperId) FROM PAPER WHERE StartTime='" + timeString + "';";
-               	System.out.println(query);
-               	String displayString = "Number of papers at " + timeString + ":   " + retrieveFromTable(query, Boolean.FALSE);
+               	String query = "SELECT COUNT(PaperId) as Paper FROM PAPER WHERE StartTime='" + starttime + "';";
+//               	String displayString = "Number of papers at  time slot " + time_slot.getText() + "" + timeString + ":   " + retrieveFromTable(query, Boolean.FALSE);
+               	String displayString = String.format("Number of papers at time slot %s (%s - %s): %s", time_slot.getText(), starttime, endtime, retrieveFromTable(query, Boolean.FALSE));
                	results.setText(displayString);
             }
         }
@@ -161,9 +167,8 @@ public class CollegeDBTesterGUI extends Application
             {
                 
             	String status = status2TF.getText();
-            	String query = "SELECT BannerId, StudentName FROM STUDENT_15 WHERE Status = '"+
-                    status + "';"; 
-            	String displayString = retrieveFromTable(query, Boolean.FALSE);
+            	String query = "SELECT * FROM PERSON";
+            	String displayString = retrieveFromTable(query, Boolean.TRUE);
             	results.setText(displayString);
             }
         }
@@ -291,8 +296,8 @@ public class CollegeDBTesterGUI extends Application
         attachHandlers();
         
         //Create a scene and place it on stage
-        scene = new Scene(pane);
-        primaryStage.setTitle("College Database");
+        Scene scene = new Scene(pane);
+        primaryStage.setTitle("Conference Database");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -314,7 +319,7 @@ public class CollegeDBTesterGUI extends Application
 		// Now, we have to print out these rows in a user-understandable form
 		if ((data == null) || (data.size() == 0))
 		{
-			return ("No results were returned from database for this query");
+			return ("NO DATA");
 		}
 		else
 		{
@@ -344,40 +349,26 @@ public class CollegeDBTesterGUI extends Application
     private static String vecToStringNoHeaders(Vector<Properties> data)
     {
         String result = "";
-        // Now, we have to print out these rows in a user-understandable form
-        if ((data == null) || (data.size() == 0))
+        if (data == null || data.isEmpty())
         {
-            return ("No results were returned from database for this query");
+            return ("NO DATA");
         }
         else
         {
-            // Print the headers
-            // result = ("==============================================\n");
-            Properties p1 = data.firstElement();
-            Enumeration props1 = p1.propertyNames();
-            while (props1.hasMoreElements())
-                //result += (props1.nextElement()+"\t");
-                    props1.nextElement();
-            //result += "\n";
-            //result += ("----------------------------------------------\n");
-
-            // Now go thru the entire 'data' Vector, get each Properties object out of it
-            // and print out the contents of the Properties object
             for (Properties p : data)
             {
                 Enumeration props = p.propertyNames();
                 while (props.hasMoreElements())
                     result += (p.getProperty((String)(props.nextElement())));
-                //result += "\n";
             }
-            //result += ("==============================================");
         }
+
         return result;
     }
     
   	//----------------------------------------------------------------------------
     //-------------------------------------------------------------------------------
-    public static String retrieveFromTable(String queryString, Boolean headers)
+    private static String retrieveFromTable(String queryString, Boolean headers)
     {
     	// First, set up an instance of the DatabaseAccessor class
     	DatabaseAccessor dbAcc = new DatabaseAccessor();
@@ -385,12 +376,15 @@ public class CollegeDBTesterGUI extends Application
     	// Now that you have created the query string, you set that on the DatabaseAccessor
     	// object you created using the 'setSQLStatement()' method as shown below 
     	dbAcc.setSQLStatement(queryString);
-    		
+
     	// Then invoke the method 'executeSQLSelectStatement()' on the DatabaseAccessor object
     	// as shown below to run the query. The result of running this query is a Vector of
     	// Properties objects. Each Properties object in this Vector contains the data from
     	// one of the db table rows matching the query
+//        System.out.println(dbAcc.executeSQLSelectStatement());
     	Vector<Properties> returnedValues = dbAcc.executeSQLSelectStatement();
+    	System.out.println(returnedValues);
+//    	System.out.println(returnedValues);
         if (headers == Boolean.TRUE) {
             return vecToString(returnedValues);
         } else {
@@ -400,9 +394,35 @@ public class CollegeDBTesterGUI extends Application
     	//printValues(returnedValues);
     }
 
+    private static Vector<Properties> retrieveFromQuery(String queryString)
+    {
+        DatabaseAccessor dbAcc = new DatabaseAccessor();
+        dbAcc.setSQLStatement(queryString);
+
+        return dbAcc.executeSQLSelectStatement();
+    }
+
+    private static String retrieveKeyedItem(String item, Vector<Properties> propertiesVector) {
+        for (Properties property : propertiesVector) {
+            Enumeration prop = property.propertyNames();
+            while (true){
+                if (!(prop.hasMoreElements())) break;
+                String nextItem = (String) prop.nextElement();
+                String value = property.getProperty(nextItem);
+                if (item.equals(nextItem)) return value;
+            }
+        }
+        return null;
+    }
+
+    private static String retrieveItemFromQuery(String queryString, String item){
+
+        return null;
+    }
+
   	//----------------------------------------------------------------------------
-  	
-  	public static void insertIntoTable(String insertQueryString )
+
+  	private static void insertIntoTable(String insertQueryString )
   	{
   		DatabaseMutator dbMut = new DatabaseMutator();
   		
@@ -418,7 +438,7 @@ public class CollegeDBTesterGUI extends Application
   	
   	
   	//----------------------------------------------------------------------------
-  	public static void updateTable(String updateQueryString)
+  	private static void updateTable(String updateQueryString)
   	{
   		DatabaseMutator dbMut = new DatabaseMutator();
   		
@@ -434,7 +454,7 @@ public class CollegeDBTesterGUI extends Application
   	
   	
   	//------------------------------------------------------------------------
-  	public static void deleteFromTable(String deleteQueryString)
+  	private static void deleteFromTable(String deleteQueryString)
   	{
   		DatabaseMutator dbMut = new DatabaseMutator();
   		
