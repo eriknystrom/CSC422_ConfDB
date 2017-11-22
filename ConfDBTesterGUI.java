@@ -25,22 +25,11 @@ public class ConfDBTesterGUI extends Application
     // Don't create the objects at this point.
     // First we need a GridPane
     private GridPane   pane;
-    
-    // We need 5 labels
-//    private Label      displayLabel;
-//    private Label      q1Label;
-//    private Label      q2Label;
-//    private Label      q3Label;
-//    private Label      q4Label;
-//    private Label      q5Label;
-//    private Label      q6Label;
-//    private Label      q7Label;
-//    private Label      q8Label;
-    
+
     //We need 5 text fields
     private TextField time_slot;
-    private TextField status2TF;
-    private TextField deptId3TF;
+    private TextField building_entry;
+    private TextField paper_subject;
     private TextField deptId4TF;
     private TextField bannerId5TF;
     private TextField deptId6TF;
@@ -48,8 +37,7 @@ public class ConfDBTesterGUI extends Application
     private TextField studentId7TF;
     private TextField status7TF;
     private TextField deptId8TF;
-    //private TextArea textArea;
-    
+
     // We need a button
     private Button q1;
     private Button q2;
@@ -66,30 +54,27 @@ public class ConfDBTesterGUI extends Application
     // We need a scene
 //    private Scene scene;
     
-    //----------------------------------------------------------
-    // crtate GUI components
+    // create GUI components
     private void createGUIComponents()
     {
         //Create GUI Objects
         pane = new GridPane();
-        
-        //----------------------------------------------------------
+
         //Create Labels
         Label displayLabel = new Label("DISPLAY INFORMATION");
-        Label q1Label = new Label("Q1. Papers in selected time-slot");
-        Label q2Label = new Label("Q2. Papers scheduled in selected building");
-        Label q3Label = new Label("Q3. Professor id, name, and Department for this ");
+        Label q1Label = new Label("Q1. Papers in entered time-slot");
+        Label q2Label = new Label("Q2. Papers scheduled in entered building");
+        Label q3Label = new Label("Q3. Papers matching entered category ");
         Label q4Label = new Label("Q4. Prof Name, Crs Name, Sem and Section for all courses in this ");
         Label q5Label = new Label("Q5. Stu name, Crs Name, Sem, Section & grade for the student with this  ");
         Label q6Label = new Label("Q6. Insert a new department ");
         Label q7Label = new Label("Q7. Update a Student Status ");
         Label q8Label = new Label("Q8. Delete a department ");
-        
-        //----------------------------------------------------------
+
         // Create the text fields
-        time_slot = new TextField("<TimeSlot 1-5>");
-        status2TF = new TextField("<status>");
-        deptId3TF = new TextField("<deptId>");
+        time_slot = new TextField("<Time Slot>");
+        building_entry = new TextField("<status>");
+        paper_subject = new TextField("<deptId>");
         deptId4TF = new TextField("<deptId>");
         bannerId5TF = new TextField("<bannerId>");
         deptId6TF = new TextField("<deptId>");
@@ -98,7 +83,6 @@ public class ConfDBTesterGUI extends Application
         status7TF = new TextField("<new status>");
         deptId8TF = new TextField("<deptId>");
         
-        //----------------------------------------------------------
         // Create the buttons
         q1 = new Button("Q1");
         q2 = new Button("Q2");
@@ -110,17 +94,15 @@ public class ConfDBTesterGUI extends Application
         q8 = new Button("Q8");
         quit = new Button("Quit");
         
-        //----------------------------------------------------------
         // Create the text area to display results
         results = new TextArea();
  
         
-        //----------------------------------------------------------
         //Add the components to the pane
         pane.add(displayLabel, 0, 0); 
         pane.add(q1Label,      0, 1);  pane.add(time_slot, 1, 1);     pane.add(q1,  3,  1);
-        pane.add(q2Label,      0, 2);  pane.add(status2TF, 1, 2);     pane.add(q2,  3,  2);
-        pane.add(q3Label,      0, 3);  pane.add(deptId3TF, 1, 3);     pane.add(q3,  3,  3);
+        pane.add(q2Label,      0, 2);  pane.add(building_entry, 1, 2);     pane.add(q2,  3,  2);
+        pane.add(q3Label,      0, 3);  pane.add(paper_subject, 1, 3);     pane.add(q3,  3,  3);
         pane.add(q4Label,      0, 4);  pane.add(deptId4TF, 1, 4);     pane.add(q4,  3,  4);
         pane.add(q5Label,      0, 5);  pane.add(bannerId5TF, 1, 5);   pane.add(q5,  3,  5);
         pane.add(q6Label,      0, 6);  pane.add(deptId6TF, 1, 6);     pane.add(deptName6TF, 2, 6); pane.add(q6,  3,  6);
@@ -134,63 +116,53 @@ public class ConfDBTesterGUI extends Application
         pane.setAlignment(Pos.CENTER);
         
     }
-    //----------------------------------------------------------
     //Attach handlers
     private void attachHandlers()
     {
-	//----------------------------------------------------------
-        
         q1.setOnAction(new EventHandler<ActionEvent>()
         {
             public void handle(ActionEvent e)
             {
-                String time_slot_query = "SELECT starttime,endtime FROM TIME_SLOT WHERE TimeSlotId='"+time_slot.getText()+"';";
+                String time_slot_query = String.format("SELECT starttime,endtime FROM TIME_SLOT WHERE TimeSlotId='%s';", time_slot.getText());
 
                 Vector<Properties> returnString = retrieveFromQuery(time_slot_query);
                 String starttime = retrieveKeyedItem("starttime", returnString);
                 String endtime = retrieveKeyedItem("endtime", returnString);
 
-
-                String timeString = retrieveFromTable(time_slot_query, Boolean.FALSE);
-               	String query = "SELECT COUNT(PaperId) as Paper FROM PAPER WHERE StartTime='" + starttime + "';";
+               	String query = String.format("SELECT COUNT(PaperId) as Paper FROM PAPER WHERE StartTime='%s';", starttime);
 //               	String displayString = "Number of papers at  time slot " + time_slot.getText() + "" + timeString + ":   " + retrieveFromTable(query, Boolean.FALSE);
-               	String displayString = String.format("Number of papers at time slot %s (%s - %s): %s", time_slot.getText(), starttime, endtime, retrieveFromTable(query, Boolean.FALSE));
+               	String displayString = String.format("Number of papers at time slot %s (%s - %s): %s",
+                        time_slot.getText(),
+                        starttime,
+                        endtime,
+                        retrieveFromTable(query, Boolean.FALSE));
                	results.setText(displayString);
             }
         }
         );  
-	//----------------------------------------------------------
-     	
         q2.setOnAction(new EventHandler<ActionEvent>()
         {
             public void handle(ActionEvent e)
             {
                 
-            	String status = status2TF.getText();
-            	String query = "SELECT * FROM PERSON";
-            	String displayString = retrieveFromTable(query, Boolean.TRUE);
+            	String building = building_entry.getText();
+            	String query = String.format("SELECT COUNT(BuildingId) FROM SESSION_ROOM_CHAIR WHERE BuildingId=(SELECT Id FROM BUILDING WHERE Name='%s');", building);
+            	String displayString = String.format("Papers in %s: %s", building, retrieveFromTable(query, Boolean.FALSE));
             	results.setText(displayString);
             }
         }
         );  
-	//----------------------------------------------------------
-     	
         q3.setOnAction(new EventHandler<ActionEvent>()
         {
             public void handle(ActionEvent e)
             {  
-            	String deptId = deptId3TF.getText();
-            	String query = "SELECT P.ProfessorId, P.ProfessorName, "+
-            			"D.DepartmentName FROM PROFESSOR_15 P, DEPARTMENT_15 D "+ 
-            			"WHERE P.DepartmentId = D.DepartmentId AND P.DepartmentId = '" + 
-            			deptId +"';"; 
-            	String displayString = retrieveFromTable(query, Boolean.FALSE);
+            	String subject = paper_subject.getText();
+            	String query = String.format("SELECT * FROM PAPER WHERE SubjectId=(SELECT SubjectId FROM SUBJECT_CATEGORY Where description='%s') LIMIT 10;", subject);
+            	String displayString = retrieveFromTable(query, Boolean.TRUE);
             	results.setText(displayString);
             }
         }
         ); 
-	//---------------------------------------------------------- 
-     	
         q4.setOnAction(new EventHandler<ActionEvent>()
         {
             public void handle(ActionEvent e)
@@ -209,7 +181,6 @@ public class ConfDBTesterGUI extends Application
             }
         }
         ); 
-	//---------------------------------------------------------- 
      	// Attach handlers to button using anonymous class
         q5.setOnAction(new EventHandler<ActionEvent>()
         {
@@ -226,7 +197,6 @@ public class ConfDBTesterGUI extends Application
             }
         }
         );  
-	//----------------------------------------------------------
      	// Attach handlers to button using anonymous class
         q6.setOnAction(new EventHandler<ActionEvent>()
         {
@@ -244,7 +214,6 @@ public class ConfDBTesterGUI extends Application
             }
         }
         );  
-	//----------------------------------------------------------
      	// Attach handlers to button using anonymous class
         q7.setOnAction(new EventHandler<ActionEvent>()
         {
@@ -262,7 +231,6 @@ public class ConfDBTesterGUI extends Application
             }
         }
         );  
-	//----------------------------------------------------------
      	// Attach handlers to button using anonymous class
         q8.setOnAction(new EventHandler<ActionEvent>()
         {
@@ -289,7 +257,6 @@ public class ConfDBTesterGUI extends Application
         );  
     }
     
-    //----------------------------------------------------------
     public void start(Stage primaryStage)
     {
         createGUIComponents();
@@ -301,13 +268,10 @@ public class ConfDBTesterGUI extends Application
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-    //----------------------------------------------------------
     public static void main(String[] args)
     {
         Application.launch(args);
     }
-    
-    //----------------------------------------------------------
     /**
      * Converts a Vector of properties to a printable String
      * @param data
@@ -331,7 +295,6 @@ public class ConfDBTesterGUI extends Application
                 	   result += (props1.nextElement()+"\t");
 			result += "\n";
 			result += ("----------------------------------------------\n");
-			
 			// Now go thru the entire 'data' Vector, get each Properties object out of it
 			// and print out the contents of the Properties object
 			for (Properties p : data)
@@ -366,8 +329,6 @@ public class ConfDBTesterGUI extends Application
         return result;
     }
     
-  	//----------------------------------------------------------------------------
-    //-------------------------------------------------------------------------------
     private static String retrieveFromTable(String queryString, Boolean headers)
     {
     	// First, set up an instance of the DatabaseAccessor class
@@ -420,8 +381,6 @@ public class ConfDBTesterGUI extends Application
         return null;
     }
 
-  	//----------------------------------------------------------------------------
-
   	private static void insertIntoTable(String insertQueryString )
   	{
   		DatabaseMutator dbMut = new DatabaseMutator();
@@ -435,9 +394,6 @@ public class ConfDBTesterGUI extends Application
   			System.out.println("Row inserted successfully");
   	}
   	
-  	
-  	
-  	//----------------------------------------------------------------------------
   	private static void updateTable(String updateQueryString)
   	{
   		DatabaseMutator dbMut = new DatabaseMutator();
@@ -451,9 +407,6 @@ public class ConfDBTesterGUI extends Application
   			System.out.println("Row updated successfully");
   	}
   	
-  	
-  	
-  	//------------------------------------------------------------------------
   	private static void deleteFromTable(String deleteQueryString)
   	{
   		DatabaseMutator dbMut = new DatabaseMutator();
@@ -466,11 +419,4 @@ public class ConfDBTesterGUI extends Application
   		else
   			System.out.println("Row deleted successfully");
   	}
-  	
 }
-
-
-//----------------------------------------------------------
-
-
- 
