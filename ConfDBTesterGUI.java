@@ -330,146 +330,146 @@ public class ConfDBTesterGUI extends Application {
 
     //Attach handlers
     private void attachHandlers() {
-        q1.setOnAction((event)-> {
-                               String paper_query = String.format("SELECT T.StartTime, T.EndTime, COUNT(P.PaperId)" +
-                                       " as Papers FROM TIME_SLOT T, PAPER P WHERE" +
-                                       " (P.StartTime=T.StartTime AND T.TimeSlotId=%s);", timeSlot.getText());
+        q1.setOnAction((event) -> {
+                    String paper_query = String.format("SELECT T.StartTime, T.EndTime, COUNT(P.PaperId)" +
+                            " as Papers FROM TIME_SLOT T, PAPER P WHERE" +
+                            " (P.StartTime=T.StartTime AND T.TimeSlotId=%s);", timeSlot.getText());
 
-                               Vector<Properties> returnString = retrieveFromQuery(paper_query);
-                               String starttime = retrieveKeyedItem("starttime", returnString);
-                               String endtime = retrieveKeyedItem("endtime", returnString);
-                               String papers = retrieveKeyedItem("papers", returnString);
-                               String displayString = String.format("Number of papers at time slot %s (%s - %s): %s",
-                                       timeSlot.getText(),
-                                       starttime,
-                                       endtime,
-                                       papers);
-                               results.setText(displayString);
-                       }
+                    Vector<Properties> returnString = retrieveFromQuery(paper_query);
+                    String starttime = retrieveKeyedItem("starttime", returnString);
+                    String endtime = retrieveKeyedItem("endtime", returnString);
+                    String papers = retrieveKeyedItem("papers", returnString);
+                    String displayString = String.format("Number of papers at time slot %s (%s - %s): %s",
+                            timeSlot.getText(),
+                            starttime,
+                            endtime,
+                            papers);
+                    results.setText(displayString);
+                }
         );
-        q2.setOnAction((event)-> {
-                               String building = buildingEntry.getText();
-                               String query = String.format("SELECT COUNT(BuildingId) FROM SESSION_ROOM_CHAIR" +
-                                       " WHERE BuildingId=(SELECT Id FROM BUILDING WHERE Name='%s');", building);
-                               String displayString = String.format("Papers in %s: %s",
-                                       building, retrieveFromTable(query, Boolean.FALSE));
-                               results.setText(displayString);
-                       }
+        q2.setOnAction((event) -> {
+                    String building = buildingEntry.getText();
+                    String query = String.format("SELECT COUNT(BuildingId) FROM SESSION_ROOM_CHAIR" +
+                            " WHERE BuildingId=(SELECT Id FROM BUILDING WHERE Name='%s');", building);
+                    String displayString = String.format("Papers in %s: %s",
+                            building, retrieveFromTable(query, Boolean.FALSE));
+                    results.setText(displayString);
+                }
         );
-        q3.setOnAction((event)-> {
-                               String subject = paperSubject.getText();
-                               String query = String.format("SELECT * FROM PAPER WHERE SubjectId=" +
-                                       "(SELECT SubjectId FROM SUBJECT_CATEGORY Where description='%s')" +
-                                       " LIMIT 10;", subject);
-                               String displayString = retrieveFromTable(query, Boolean.TRUE);
-                               results.setText(displayString);
-                       }
+        q3.setOnAction((event) -> {
+                    String subject = paperSubject.getText();
+                    String query = String.format("SELECT * FROM PAPER WHERE SubjectId=" +
+                            "(SELECT SubjectId FROM SUBJECT_CATEGORY Where description='%s')" +
+                            " LIMIT 10;", subject);
+                    String displayString = retrieveFromTable(query, Boolean.TRUE);
+                    results.setText(displayString);
+                }
         );
-        q4.setOnAction((event)-> {
-                               String subject = paperSubjectCount.getText();
-                               String query = String.format("SELECT COUNT(*) as 'Number Papers In %s' FROM PAPER" +
-                                       " WHERE SubjectId=(SELECT SubjectId FROM SUBJECT_CATEGORY " +
-                                       "WHERE description='%<s');", subject);
-                               System.out.println(query);
-                               String displayString = String.format("Number of papers in %s: %s", subject,
-                                       retrieveFromTable(query, Boolean.FALSE));
-                               results.setText(displayString);
-                       }
+        q4.setOnAction((event) -> {
+                    String subject = paperSubjectCount.getText();
+                    String query = String.format("SELECT COUNT(*) as 'Number Papers In %s' FROM PAPER" +
+                            " WHERE SubjectId=(SELECT SubjectId FROM SUBJECT_CATEGORY " +
+                            "WHERE description='%<s');", subject);
+                    System.out.println(query);
+                    String displayString = String.format("Number of papers in %s: %s", subject,
+                            retrieveFromTable(query, Boolean.FALSE));
+                    results.setText(displayString);
+                }
         );
         // Attach handlers to button using anonymous class
-        q5.setOnAction((event)-> {
-                               String query = "SELECT P.PersonId, P.LastName, P.FirstName FROM SESSION_CHAIR S," +
-                                       " PERSON P WHERE P.PersonId=S.SessionChairId ORDER BY P.LastName ASC;";
-                               System.out.println(query);
-                               String displayString = retrieveFromTable(query, Boolean.TRUE);
-                               results.setText(displayString);
-                       }
+        q5.setOnAction((event) -> {
+                    String query = "SELECT P.PersonId, P.LastName, P.FirstName FROM SESSION_CHAIR S," +
+                            " PERSON P WHERE P.PersonId=S.SessionChairId ORDER BY P.LastName ASC;";
+                    System.out.println(query);
+                    String displayString = retrieveFromTable(query, Boolean.TRUE);
+                    results.setText(displayString);
+                }
         );
         // Attach handlers to button using anonymous class
-        q6.setOnAction((event)-> {
-                               String query = "SELECT S.SessionId, S.RoomId, B.Name FROM SESSION_ROOM_CHAIR S," +
-                                       " BUILDING B WHERE B.Id=S.BuildingId ORDER BY S.SessionId LIMIT 10;";
-                               System.out.println(query);
-                               String displayString = retrieveFromTable(query, Boolean.TRUE);
-                               results.setText(displayString);
-                       }
+        q6.setOnAction((event) -> {
+                    String query = "SELECT S.SessionId, S.RoomId, B.Name FROM SESSION_ROOM_CHAIR S," +
+                            " BUILDING B WHERE B.Id=S.BuildingId ORDER BY S.SessionId LIMIT 10;";
+                    System.out.println(query);
+                    String displayString = retrieveFromTable(query, Boolean.TRUE);
+                    results.setText(displayString);
+                }
         );
         // Attach handlers to button using anonymous class
-        q7.setOnAction((event)-> {
-                               String last_name = lastName.getText();
-                               String first_name = firstName.getText();
-                               String query = String.format("SELECT Title, LastName, FirstName, Description, SessionId, StartTime," +
-                                       " EndTime FROM SUBJECT_CATEGORY SC JOIN PAPER P ON SC.SubjectId = P.SubjectId" +
-                                       " JOIN PERSON PN ON PN.PersonId = P.ContactAuthorId WHERE LastName = '%s'" +
-                                       " AND FirstName = '%s';", last_name, first_name);
-                               System.out.println(query);
-                               String displayString = retrieveFromTable(query, Boolean.TRUE);
-                               results.setText(displayString);
-                       }
+        q7.setOnAction((event) -> {
+                    String last_name = lastName.getText();
+                    String first_name = firstName.getText();
+                    String query = String.format("SELECT Title, LastName, FirstName, Description, SessionId, StartTime," +
+                            " EndTime FROM SUBJECT_CATEGORY SC JOIN PAPER P ON SC.SubjectId = P.SubjectId" +
+                            " JOIN PERSON PN ON PN.PersonId = P.ContactAuthorId WHERE LastName = '%s'" +
+                            " AND FirstName = '%s';", last_name, first_name);
+                    System.out.println(query);
+                    String displayString = retrieveFromTable(query, Boolean.TRUE);
+                    results.setText(displayString);
+                }
         );
         // Attach handlers to button using anonymous class
-        q8.setOnAction((event)-> {
-                               String start = insStartTime.getText();
-                               String end = insEndTime.getText();
-                               String queryOne = "SET @timeid = (SELECT MAX(TimeSlotId) FROM TIME_SLOT)+1;";
-                               retrieveFromTable(queryOne, Boolean.FALSE);
-                               String queryTwo = String.format("INSERT INTO TIME_SLOT VALUES (@timeid, '%s', '%s');", start, end);
-                               System.out.println(queryTwo);
-                               insertIntoTable(queryTwo);
+        q8.setOnAction((event) -> {
+                    String start = insStartTime.getText();
+                    String end = insEndTime.getText();
+                    String queryOne = "SET @timeid = (SELECT MAX(TimeSlotId) FROM TIME_SLOT)+1;";
+                    retrieveFromTable(queryOne, Boolean.FALSE);
+                    String queryTwo = String.format("INSERT INTO TIME_SLOT VALUES (@timeid, '%s', '%s');", start, end);
+                    System.out.println(queryTwo);
+                    insertIntoTable(queryTwo);
 
-                               String displayString = queryOne + "\n" + queryTwo +
-                                       "\n\nRow(s) inserted Successfully";
-                               results.setText(displayString);
-                       }
+                    String displayString = queryOne + "\n" + queryTwo +
+                            "\n\nRow(s) inserted Successfully";
+                    results.setText(displayString);
+                }
         );
-        q9.setOnAction((event)-> {
-                               String newStart = newStartTime.getText();
-                               String newEnd = newEndTime.getText();
-                               String timeSlot = timeSlotId.getText();
-                               String query = String.format("UPDATE TIME_SLOT SET StartTime='%s'," +
-                                       " EndTime='%s' WHERE TimeSlotId=%s;", newStart, newEnd, timeSlot);
-                               System.out.println(query);
-                               updateTable(query);
+        q9.setOnAction((event) -> {
+                    String newStart = newStartTime.getText();
+                    String newEnd = newEndTime.getText();
+                    String timeSlot = timeSlotId.getText();
+                    String query = String.format("UPDATE TIME_SLOT SET StartTime='%s'," +
+                            " EndTime='%s' WHERE TimeSlotId=%s;", newStart, newEnd, timeSlot);
+                    System.out.println(query);
+                    updateTable(query);
 
-                               String displayString = query +
-                                       "\n\nRow(s) updated Successfully";
-                               results.setText(displayString);
-                       }
+                    String displayString = query +
+                            "\n\nRow(s) updated Successfully";
+                    results.setText(displayString);
+                }
         );
-        q10.setOnAction((event)-> {
-                                String timeSlot = delTimeSlotId.getText();
-                                String query = String.format("DELETE FROM TIME_SLOT WHERE TimeSlotId='%s';", timeSlot);
-                                System.out.println(query);
-                                deleteFromTable(query);
+        q10.setOnAction((event) -> {
+                    String timeSlot = delTimeSlotId.getText();
+                    String query = String.format("DELETE FROM TIME_SLOT WHERE TimeSlotId='%s';", timeSlot);
+                    System.out.println(query);
+                    deleteFromTable(query);
 
-                                String displayString = query +
-                                        "\n\nRow(s) deleted Successfully";
-                                results.setText(displayString);
-                        }
+                    String displayString = query +
+                            "\n\nRow(s) deleted Successfully";
+                    results.setText(displayString);
+                }
         );
-        q11.setOnAction((event)-> {
-                                String firstName = authFirstName.getText();
-                                String lastName = authLastName.getText();
-                                String query = String.format("SELECT COUNT(Title) FROM SUBJECT_CATEGORY JOIN PAPER" +
-                                        " ON SUBJECT_CATEGORY.SubjectId = PAPER.SubjectId JOIN PERSON ON" +
-                                        " PERSON.PersonId = PAPER.ContactAuthorId " +
-                                        "WHERE LastName = '%s' AND FirstName = '%s';", lastName, firstName);
-                                System.out.println(query);
-                                String displayString = retrieveFromTable(query, Boolean.TRUE);
-                                results.setText(displayString);
-                        }
+        q11.setOnAction((event) -> {
+                    String firstName = authFirstName.getText();
+                    String lastName = authLastName.getText();
+                    String query = String.format("SELECT COUNT(Title) FROM SUBJECT_CATEGORY JOIN PAPER" +
+                            " ON SUBJECT_CATEGORY.SubjectId = PAPER.SubjectId JOIN PERSON ON" +
+                            " PERSON.PersonId = PAPER.ContactAuthorId " +
+                            "WHERE LastName = '%s' AND FirstName = '%s';", lastName, firstName);
+                    System.out.println(query);
+                    String displayString = retrieveFromTable(query, Boolean.TRUE);
+                    results.setText(displayString);
+                }
         );
-        q12.setOnAction((event)-> {
-                                String roomNum = roomNumber.getText();
-                                String query = String.format("SELECT BUILDING.Name FROM BUILDING," +
-                                        " ROOM WHERE ROOM.BuildingId = BUILDING.Id AND ROOM.RoomId = '%s';", roomNum);
-                                System.out.println(query);
-                                String displayString = retrieveFromTable(query, Boolean.TRUE);
-                                results.setText(displayString);
-                        }
+        q12.setOnAction((event) -> {
+                    String roomNum = roomNumber.getText();
+                    String query = String.format("SELECT BUILDING.Name FROM BUILDING," +
+                            " ROOM WHERE ROOM.BuildingId = BUILDING.Id AND ROOM.RoomId = '%s';", roomNum);
+                    System.out.println(query);
+                    String displayString = retrieveFromTable(query, Boolean.TRUE);
+                    results.setText(displayString);
+                }
         );
 
-        quit.setOnAction((event)-> System.exit(0));
+        quit.setOnAction((event) -> System.exit(0));
     }
 
     public void start(Stage primaryStage) {
