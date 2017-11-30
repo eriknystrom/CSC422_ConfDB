@@ -78,9 +78,6 @@ public class ConfDBTesterGUI extends Application {
 
     /**
      * Converts a Vector of properties to a printable String
-     *
-     * @param data
-     * @return
      */
     private static String vecToString(Vector<Properties> data) {
         String result = "";
@@ -340,8 +337,7 @@ public class ConfDBTesterGUI extends Application {
 
     //Attach handlers
     private void attachHandlers() {
-        q1.setOnAction(new EventHandler<ActionEvent>() {
-                           public void handle(ActionEvent e) {
+        q1.setOnAction((event)-> {
                                String paper_query = String.format("SELECT T.StartTime, T.EndTime, COUNT(P.PaperId)" +
                                        " as Papers FROM TIME_SLOT T, PAPER P WHERE" +
                                        " (P.StartTime=T.StartTime AND T.TimeSlotId=%s);", timeSlot.getText());
@@ -356,35 +352,27 @@ public class ConfDBTesterGUI extends Application {
                                        endtime,
                                        papers);
                                results.setText(displayString);
-                           }
                        }
         );
-        q2.setOnAction(new EventHandler<ActionEvent>() {
-                           public void handle(ActionEvent e) {
-
+        q2.setOnAction((event)-> {
                                String building = buildingEntry.getText();
                                String query = String.format("SELECT COUNT(BuildingId) FROM SESSION_ROOM_CHAIR" +
                                        " WHERE BuildingId=(SELECT Id FROM BUILDING WHERE Name='%s');", building);
                                String displayString = String.format("Papers in %s: %s",
                                        building, retrieveFromTable(query, Boolean.FALSE));
                                results.setText(displayString);
-                           }
                        }
         );
-        q3.setOnAction(new EventHandler<ActionEvent>() {
-                           public void handle(ActionEvent e) {
+        q3.setOnAction((event)-> {
                                String subject = paperSubject.getText();
                                String query = String.format("SELECT * FROM PAPER WHERE SubjectId=" +
                                        "(SELECT SubjectId FROM SUBJECT_CATEGORY Where description='%s')" +
                                        " LIMIT 10;", subject);
                                String displayString = retrieveFromTable(query, Boolean.TRUE);
                                results.setText(displayString);
-                           }
                        }
         );
-        q4.setOnAction(new EventHandler<ActionEvent>() {
-                           public void handle(ActionEvent e) {
-
+        q4.setOnAction((event)-> {
                                String subject = paperSubjectCount.getText();
                                String query = String.format("SELECT COUNT(*) as 'Number Papers In %s' FROM PAPER" +
                                        " WHERE SubjectId=(SELECT SubjectId FROM SUBJECT_CATEGORY " +
@@ -393,34 +381,28 @@ public class ConfDBTesterGUI extends Application {
                                String displayString = String.format("Number of papers in %s: %s", subject,
                                        retrieveFromTable(query, Boolean.FALSE));
                                results.setText(displayString);
-                           }
                        }
         );
         // Attach handlers to button using anonymous class
-        q5.setOnAction(new EventHandler<ActionEvent>() {
-                           public void handle(ActionEvent e) {
+        q5.setOnAction((event)-> {
                                String query = "SELECT P.PersonId, P.LastName, P.FirstName FROM SESSION_CHAIR S," +
                                        " PERSON P WHERE P.PersonId=S.SessionChairId ORDER BY P.LastName ASC;";
                                System.out.println(query);
                                String displayString = retrieveFromTable(query, Boolean.TRUE);
                                results.setText(displayString);
-                           }
                        }
         );
         // Attach handlers to button using anonymous class
-        q6.setOnAction(new EventHandler<ActionEvent>() {
-                           public void handle(ActionEvent e) {
+        q6.setOnAction((event)-> {
                                String query = "SELECT S.SessionId, S.RoomId, B.Name FROM SESSION_ROOM_CHAIR S," +
                                        " BUILDING B WHERE B.Id=S.BuildingId ORDER BY S.SessionId LIMIT 10;";
                                System.out.println(query);
                                String displayString = retrieveFromTable(query, Boolean.TRUE);
                                results.setText(displayString);
-                           }
                        }
         );
         // Attach handlers to button using anonymous class
-        q7.setOnAction(new EventHandler<ActionEvent>() {
-                           public void handle(ActionEvent e) {
+        q7.setOnAction((event)-> {
                                String last_name = lastName.getText();
                                String first_name = firstName.getText();
                                String query = String.format("SELECT Title, LastName, FirstName, Description, SessionId, StartTime," +
@@ -430,12 +412,10 @@ public class ConfDBTesterGUI extends Application {
                                System.out.println(query);
                                String displayString = retrieveFromTable(query, Boolean.TRUE);
                                results.setText(displayString);
-                           }
                        }
         );
         // Attach handlers to button using anonymous class
-        q8.setOnAction(new EventHandler<ActionEvent>() {
-                           public void handle(ActionEvent e) {
+        q8.setOnAction((event)-> {
                                String start = insStartTime.getText();
                                String end = insEndTime.getText();
                                String queryOne = "SET @timeid = (SELECT MAX(TimeSlotId) FROM TIME_SLOT)+1;";
@@ -447,11 +427,9 @@ public class ConfDBTesterGUI extends Application {
                                String displayString = queryOne + "\n" + queryTwo +
                                        "\n\nRow(s) inserted Successfully";
                                results.setText(displayString);
-                           }
                        }
         );
-        q9.setOnAction(new EventHandler<ActionEvent>() {
-                           public void handle(ActionEvent e) {
+        q9.setOnAction((event)-> {
                                String newStart = newStartTime.getText();
                                String newEnd = newEndTime.getText();
                                String timeSlot = timeSlotId.getText();
@@ -463,11 +441,9 @@ public class ConfDBTesterGUI extends Application {
                                String displayString = query +
                                        "\n\nRow(s) updated Successfully";
                                results.setText(displayString);
-                           }
                        }
         );
-        q10.setOnAction(new EventHandler<ActionEvent>() {
-                            public void handle(ActionEvent e) {
+        q10.setOnAction((event)-> {
                                 String timeSlot = delTimeSlotId.getText();
                                 String query = String.format("DELETE FROM TIME_SLOT WHERE TimeSlotId='%s';", timeSlot);
                                 System.out.println(query);
@@ -476,11 +452,9 @@ public class ConfDBTesterGUI extends Application {
                                 String displayString = query +
                                         "\n\nRow(s) deleted Successfully";
                                 results.setText(displayString);
-                            }
                         }
         );
-        q11.setOnAction(new EventHandler<ActionEvent>() {
-                            public void handle(ActionEvent e) {
+        q11.setOnAction((event)-> {
                                 String firstName = authFirstName.getText();
                                 String lastName = authLastName.getText();
                                 String query = String.format("SELECT COUNT(Title) FROM SUBJECT_CATEGORY JOIN PAPER" +
@@ -490,26 +464,21 @@ public class ConfDBTesterGUI extends Application {
                                 System.out.println(query);
                                 String displayString = retrieveFromTable(query, Boolean.TRUE);
                                 results.setText(displayString);
-                            }
                         }
         );
-        q12.setOnAction(new EventHandler<ActionEvent>() {
-                            public void handle(ActionEvent e) {
+        q12.setOnAction((event)-> {
                                 String roomNum = roomNumber.getText();
                                 String query = String.format("SELECT BUILDING.Name FROM BUILDING," +
                                         " ROOM WHERE ROOM.BuildingId = BUILDING.Id AND ROOM.RoomId = '%s';", roomNum);
                                 System.out.println(query);
                                 String displayString = retrieveFromTable(query, Boolean.TRUE);
                                 results.setText(displayString);
-                            }
                         }
         );
 
-        quit.setOnAction(new EventHandler<ActionEvent>() {
-                             public void handle(ActionEvent e) {
-                                 System.exit(0);
-                             }
-                         }
+        quit.setOnAction((event)-> {
+                    System.exit(0);
+                }
         );
     }
 
