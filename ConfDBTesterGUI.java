@@ -30,7 +30,7 @@ public class ConfDBTesterGUI extends Application
     private TextField time_slot;
     private TextField building_entry;
     private TextField paper_subject;
-    private TextField deptId4TF;
+    private TextField paper_subject_count;
     private TextField bannerId5TF;
     private TextField deptId6TF;
     private TextField deptName6TF;
@@ -75,7 +75,7 @@ public class ConfDBTesterGUI extends Application
         time_slot = new TextField("<Time Slot>");
         building_entry = new TextField("<status>");
         paper_subject = new TextField("<deptId>");
-        deptId4TF = new TextField("<deptId>");
+        paper_subject_count = new TextField("<deptId>");
         bannerId5TF = new TextField("<bannerId>");
         deptId6TF = new TextField("<deptId>");
         deptName6TF = new TextField("<dept name>");
@@ -103,7 +103,7 @@ public class ConfDBTesterGUI extends Application
         pane.add(q1Label,      0, 1);  pane.add(time_slot, 1, 1);     pane.add(q1,  3,  1);
         pane.add(q2Label,      0, 2);  pane.add(building_entry, 1, 2);     pane.add(q2,  3,  2);
         pane.add(q3Label,      0, 3);  pane.add(paper_subject, 1, 3);     pane.add(q3,  3,  3);
-        pane.add(q4Label,      0, 4);  pane.add(deptId4TF, 1, 4);     pane.add(q4,  3,  4);
+        pane.add(q4Label,      0, 4);  pane.add(paper_subject_count, 1, 4);     pane.add(q4,  3,  4);
         pane.add(q5Label,      0, 5);  pane.add(bannerId5TF, 1, 5);   pane.add(q5,  3,  5);
         pane.add(q6Label,      0, 6);  pane.add(deptId6TF, 1, 6);     pane.add(deptName6TF, 2, 6); pane.add(q6,  3,  6);
         pane.add(q7Label,      0, 7);  pane.add(studentId7TF, 1, 7);  pane.add(status7TF, 2, 7); pane.add(q7,  3,  7);
@@ -168,13 +168,8 @@ public class ConfDBTesterGUI extends Application
             public void handle(ActionEvent e)
             {
                
-            	String deptId = deptId4TF.getText();
-            	String query = "SELECT P.ProfessorName, C.CourseName, T.TA_Semester, "
-            			+ "T.TA_Section " +
-            			"FROM PROFESSOR_15 P, COURSE_15 C, TEACHING_ASSIGNMENT_15 T " +
-            			"WHERE P.ProfessorId = T.ProfessorId AND "
-            			+ "C.CourseCode = T.CourseCode "+
-            			"AND C.DepartmentId = '" + deptId + "';";
+            	String subject = paper_subject_count.getText();
+            	String query = String.format("SELECT COUNT(*) as Number_Papers_In_%s FROM PAPER WHERE SubjectId=(SELECT SubjectId FROM SUBJECT_CATEGORY WHERE description='%<s');", subject);
             	System.out.println(query);
             	String displayString = retrieveFromTable(query, Boolean.FALSE);
             	results.setText(displayString);
@@ -187,10 +182,7 @@ public class ConfDBTesterGUI extends Application
             public void handle(ActionEvent e)
             {
             	String stuId = bannerId5TF.getText();
-            	String query = "SELECT S.StudentName, C.CourseName, T.TR_Semester, T.TR_Section, T.TR_Grade "+
-            			"FROM STUDENT_15 S, COURSE_15 C, TRANSCRIPT_15 T "+
-            			"WHERE S.BannerId = T.StudentId AND C.CourseCode = T.CourseCode "+
-            			"AND T.StudentId = '"+ stuId + "';"; 
+            	String query = "SELECT P.PersonId, P.LastName, P.FirstName FROM SESSION_CHAIR S, PERSON P WHERE P.PersonId=S.SessionChairId ORDER BY P.LastName ASC;";
             	System.out.println(query);
             	String displayString = retrieveFromTable(query, Boolean.FALSE);
             	results.setText(displayString);
@@ -204,8 +196,7 @@ public class ConfDBTesterGUI extends Application
             {
             	String deptId = deptId6TF.getText();
             	String deptName = deptName6TF.getText();
-            	String query = "INSERT INTO DEPARTMENT_15 VALUES ('" + 
-            	deptId +"', '" + deptName + "');"; 
+            	String query = "SELECT S.SessionId, S.RoomId, B.Name FROM SESSION_ROOM_CHAIR S, BUILDING B WHERE B.Id=S.BuildingId ORDER BY S.SessionId LIMIT 10;";
             	System.out.println(query);
             	insertIntoTable(query);
             	
