@@ -1,6 +1,4 @@
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -17,8 +15,8 @@ import java.util.Vector;
 /**
  * For CSC/CIS 422 class
  *
- * @author (your name)
- * @version (2017)
+ * @author Erik Nystrom
+ * @version (2017).9
  */
 //----------------------------------------------------------
 public class ConfDBTesterGUI extends Application {
@@ -80,7 +78,7 @@ public class ConfDBTesterGUI extends Application {
      * Converts a Vector of properties to a printable String
      */
     private static String vecToString(Vector<Properties> data) {
-        String result = "";
+        String result;
         // Now, we have to print out these rows in a user-understandable form
         if ((data == null) || (data.size() == 0)) {
             return ("NO DATA");
@@ -163,11 +161,6 @@ public class ConfDBTesterGUI extends Application {
                 if (item.equals(nextItem)) return value;
             }
         }
-        return null;
-    }
-
-    private static String retrieveItemFromQuery(String queryString, String item) {
-
         return null;
     }
 
@@ -419,7 +412,7 @@ public class ConfDBTesterGUI extends Application {
                                String start = insStartTime.getText();
                                String end = insEndTime.getText();
                                String queryOne = "SET @timeid = (SELECT MAX(TimeSlotId) FROM TIME_SLOT)+1;";
-                               String time = retrieveFromTable(queryOne, Boolean.FALSE);
+                               retrieveFromTable(queryOne, Boolean.FALSE);
                                String queryTwo = String.format("INSERT INTO TIME_SLOT VALUES (@timeid, '%s', '%s');", start, end);
                                System.out.println(queryTwo);
                                insertIntoTable(queryTwo);
@@ -476,10 +469,7 @@ public class ConfDBTesterGUI extends Application {
                         }
         );
 
-        quit.setOnAction((event)-> {
-                    System.exit(0);
-                }
-        );
+        quit.setOnAction((event)-> System.exit(0));
     }
 
     public void start(Stage primaryStage) {
